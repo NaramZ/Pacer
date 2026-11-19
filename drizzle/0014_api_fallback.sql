@@ -1,0 +1,1 @@
+ALTER TABLE `automation_settings` ADD `api_fallback` integer DEFAULT 1 NOT NULL;

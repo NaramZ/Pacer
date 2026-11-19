@@ -1,0 +1,413 @@
+/* The track: lanes on a timeline with a playhead on today.
+   Amber = follow-ups (dark text on it), cobalt = events, ink = applications, green = replies. */
+
+.tk-top {
+  padding: clamp(28px, 5vw, 56px) 0 8px;
+  display: grid;
+  gap: 24px;
+}
+.tk-title {
+  font-family: var(--serif);
+  font-weight: 800;
+  font-size: clamp(2.5rem, 6.4vw, 4.25rem);
+  line-height: 0.95;
+  letter-spacing: -0.045em;
+  max-width: 17ch;
+  text-wrap: balance;
+}
+.tk-top .capture {
+  margin-top: 0;
+}
+.tk-top .capture-row {
+  border-radius: 14px;
+  box-shadow: none;
+  border-color: var(--line);
+  padding: 6px;
+}
+.tk-top .capture-row:focus-within {
+  border-color: var(--ink);
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--focus) 28%, transparent);
+}
+.tk-top .capture-row .button {
+  border-radius: 10px;
+}
+.tk-top .capture-options {
+  padding-inline: 6px;
+}
+
+.tk {
+  margin-top: 28px;
+  background: var(--surface);
+  border-radius: 22px;
+  padding: 18px 0 22px;
+}
+.tk-bar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 0 24px 12px;
+}
+.tk-h2 {
+  font-weight: 600;
+  font-size: 1rem;
+  color: var(--ink-2);
+}
+.tk-h2.big {
+  font-weight: 800;
+  font-size: clamp(1.5rem, 2.6vw, 1.75rem);
+  letter-spacing: -0.03em;
+  color: var(--ink);
+}
+.tk-range {
+  display: flex;
+  gap: 4px;
+  padding: 4px;
+  border-radius: 12px;
+  background: var(--surface-2);
+}
+.tk-range button {
+  min-height: 40px;
+  padding: 0 14px;
+  border: 0;
+  border-radius: 9px;
+  background: transparent;
+  color: var(--ink);
+}
+.tk-range button[aria-pressed="true"] {
+  background: var(--surface);
+  font-weight: 600;
+  box-shadow: 0 1px 2px rgb(18 24 38 / 0.12);
+}
+
+.tk-scroll {
+  overflow-x: auto;
+  scrollbar-width: thin;
+}
+.tk-grid {
+  --name-w: 174px;
+  --col-gap: 16px;
+  --pad: 24px;
+  position: relative;
+  padding-right: var(--pad);
+  display: grid;
+  grid-template-columns: var(--name-w) minmax(0, 1fr);
+  column-gap: var(--col-gap);
+  padding-top: 30px;
+}
+.tk-corner,
+.tk-name {
+  padding-left: var(--pad);
+}
+.tk-corner {
+  position: sticky;
+  left: 0;
+  z-index: 4;
+  background: var(--surface);
+}
+.tk-weeks {
+  position: relative;
+  height: 30px;
+}
+.tk-weeks span {
+  position: absolute;
+  bottom: 8px;
+  padding-left: 6px;
+  border-left: 1.5px solid var(--line);
+  color: var(--ink-2);
+  font-size: 0.8125rem;
+  font-weight: 600;
+  white-space: nowrap;
+}
+.tk-lane {
+  display: contents;
+}
+.tk-name {
+  position: sticky;
+  left: 0;
+  z-index: 4;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  border-top: 1px solid var(--surface-2);
+  background: var(--surface);
+}
+.tk-name b {
+  font-weight: 600;
+}
+.tk-name span {
+  color: var(--ink-2);
+  font-size: 0.875rem;
+}
+.tk-row {
+  position: relative;
+  border-top: 1px solid var(--surface-2);
+}
+.tk-tick {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  border-left: 1px dashed var(--surface-2);
+}
+.tk-empty {
+  position: absolute;
+  right: 0;
+  top: 50%;
+  transform: translateY(-50%);
+  padding-left: 16px;
+  max-width: 34rem;
+  color: var(--ink-2);
+  font-size: 0.9375rem;
+}
+.tk-empty a {
+  color: var(--accent);
+  font-weight: 600;
+}
+
+.tk-chip-wrap {
+  position: absolute;
+  transform: translateX(-4px);
+}
+.tk-chip-wrap.flip {
+  transform: translateX(calc(-100% + 4px));
+}
+.tk-chip {
+  min-height: 32px;
+  display: inline-flex;
+  align-items: center;
+  padding: 0 10px;
+  border-radius: 8px;
+  border: 1.5px solid transparent;
+  font-size: 0.8125rem;
+  font-weight: 600;
+  white-space: nowrap;
+  text-decoration: none;
+  transition: transform 150ms ease-out;
+}
+.tk-chip:hover {
+  transform: translateY(-1px);
+}
+.tk-chip.t-sent {
+  background: var(--ink);
+  color: var(--bg);
+}
+.tk-chip.t-due {
+  background: var(--amber);
+  color: var(--amber-ink);
+  border-color: #121826;
+}
+.tk-chip.t-coming {
+  background: var(--surface);
+  color: var(--ink);
+  border: 1.5px dashed var(--ink);
+}
+.tk-chip.t-going {
+  background: var(--accent);
+  color: var(--accent-ink);
+}
+.tk-chip.t-went {
+  background: var(--accent-soft);
+  color: var(--ink);
+}
+.tk-chip.t-reply {
+  background: var(--good);
+  color: var(--surface);
+}
+.tk-pop {
+  position: absolute;
+  top: calc(100% + 6px);
+  left: 0;
+  min-width: 200px;
+  padding: 6px;
+  border-radius: 12px;
+  background: var(--surface);
+  border: 1px solid var(--line);
+  box-shadow: var(--shadow);
+}
+.tk-chip-wrap.flip .tk-pop {
+  left: auto;
+  right: 0;
+}
+.tk-pop button {
+  width: 100%;
+  min-height: 40px;
+  padding: 0 10px;
+  border: 0;
+  border-radius: 8px;
+  background: transparent;
+  text-align: left;
+  font-weight: 600;
+}
+.tk-pop button:hover {
+  background: var(--surface-2);
+}
+
+/* The playhead spans every lane, over the timeline column only. */
+.tk-headwrap {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: calc(var(--name-w) + var(--col-gap));
+  right: var(--pad);
+  pointer-events: none;
+  z-index: 1;
+}
+.tk-head {
+  position: absolute;
+  top: 26px;
+  bottom: 0;
+  width: 2px;
+  margin-left: -1px;
+  background: var(--ink);
+}
+.tk-head span {
+  position: absolute;
+  top: -26px;
+  left: 50%;
+  transform: translateX(-50%);
+  padding: 3px 10px;
+  border-radius: 999px;
+  background: var(--ink);
+  color: var(--bg);
+  font-size: 0.8125rem;
+  font-weight: 600;
+  white-space: nowrap;
+}
+@media (prefers-reduced-motion: no-preference) {
+  .tk-head {
+    animation: tk-sweep 800ms var(--ease) both;
+  }
+}
+@keyframes tk-sweep {
+  from {
+    left: 0%;
+  }
+}
+
+/* Below the track */
+.tk-below {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 28px;
+  margin-top: 40px;
+}
+.tk-col {
+  flex: 1 1 380px;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+.tk-note {
+  color: var(--ink-2);
+  font-size: 0.875rem;
+}
+.tk-todo {
+  display: grid;
+  gap: 10px;
+}
+.tk-todo li {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 12px;
+  padding: 14px 16px;
+  border-radius: 16px;
+  background: var(--surface);
+}
+.tk-tag {
+  padding: 4px 10px;
+  border-radius: 8px;
+  font-size: 0.8125rem;
+  font-weight: 600;
+}
+.tk-tag.t-due {
+  background: var(--amber);
+  color: var(--amber-ink);
+}
+.tk-tag.t-going {
+  background: var(--accent);
+  color: var(--accent-ink);
+}
+.tk-todo-text {
+  flex: 1 1 200px;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+}
+.tk-todo-text b {
+  font-weight: 600;
+}
+.tk-todo-text span {
+  color: var(--ink-2);
+  font-size: 0.875rem;
+}
+.tk-act {
+  min-height: 44px;
+  display: inline-flex;
+  align-items: center;
+  padding: 0 16px;
+  border-radius: 10px;
+  border: 1.5px solid var(--ink);
+  background: var(--surface);
+  color: var(--ink);
+  font-weight: 600;
+  text-decoration: none;
+}
+.tk-act:hover {
+  background: var(--ink);
+  color: var(--bg);
+}
+.tk-queue li + li button {
+  border-top: 1px solid var(--line);
+}
+.tk-queue button {
+  width: 100%;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 64px;
+  gap: 16px;
+  align-items: center;
+  min-height: 56px;
+  padding: 6px 4px;
+  border: 0;
+  background: transparent;
+  text-align: left;
+}
+.tk-queue button:hover .tk-q-name b {
+  color: var(--accent);
+}
+.tk-q-name b {
+  font-weight: 600;
+}
+.tk-q-name span {
+  color: var(--ink-2);
+}
+.tk-q-fit {
+  text-align: right;
+  font-weight: 800;
+  font-size: 1.375rem;
+  font-variant-numeric: tabular-nums;
+}
+.tk-q-fit small {
+  font-size: 0.6em;
+  font-weight: 600;
+}
+
+@media (max-width: 720px) {
+  .tk {
+    border-radius: 18px;
+    margin-inline: calc(var(--gutter) * -0.5);
+  }
+  .tk-bar {
+    padding-inline: 14px;
+  }
+  .tk-grid {
+    --name-w: 118px;
+    --col-gap: 10px;
+    --pad: 14px;
+  }
+  .tk-name span {
+    font-size: 0.8125rem;
+  }
+}

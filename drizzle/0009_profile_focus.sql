@@ -1,0 +1,1 @@
+ALTER TABLE `profiles` ADD `focus` text DEFAULT '' NOT NULL;

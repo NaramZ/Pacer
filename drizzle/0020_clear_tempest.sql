@@ -1,0 +1,1 @@
+ALTER TABLE `network_events` ADD `notes` text DEFAULT '' NOT NULL;

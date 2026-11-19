@@ -1,0 +1,790 @@
+/* Resume editor: three columns (edit · page · look and checks), and the page itself in six templates. */
+
+.re-page {
+  display: flex;
+  flex-direction: column;
+  height: 100dvh;
+  min-height: 0;
+}
+
+.re-bar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 10px 14px;
+  padding: 10px 20px;
+  border-bottom: 1px solid var(--line);
+  background: var(--bg);
+}
+.re-bar h1 {
+  font-family: "Instrument Serif", serif;
+  font-weight: 400;
+  font-size: 24px;
+  margin: 0 6px 0 0;
+  letter-spacing: -0.01em;
+}
+.re-bar select {
+  max-width: 320px;
+  min-width: 0;
+  padding: 8px 10px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: var(--bg);
+  color: var(--ink);
+  font: inherit;
+  font-size: 14px;
+}
+.re-bar .grow {
+  flex: 1;
+}
+.re-state {
+  font-size: 13px;
+  color: var(--ink-2);
+}
+.re-state.dirty::before {
+  content: "";
+  display: inline-block;
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: #d97706;
+  margin-right: 6px;
+}
+
+.re-shell {
+  flex: 1;
+  min-height: 0;
+  display: grid;
+  grid-template-columns: minmax(300px, 380px) minmax(0, 1fr) minmax(280px, 340px);
+}
+.re-col {
+  min-height: 0;
+  overflow-y: auto;
+  padding: 16px 18px 40px;
+}
+.re-edit {
+  border-right: 1px solid var(--line);
+}
+.re-side {
+  border-left: 1px solid var(--line);
+}
+.re-stage {
+  min-height: 0;
+  overflow: auto;
+  background: color-mix(in srgb, var(--ink) 7%, var(--bg));
+  padding: 22px 16px 60px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+.re-zoom {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 14px;
+  font-size: 13px;
+  color: var(--ink-2);
+  align-self: stretch;
+  justify-content: center;
+}
+.re-zoom button {
+  border: 1px solid var(--line);
+  background: var(--bg);
+  color: var(--ink);
+  border-radius: 6px;
+  padding: 3px 9px;
+  font: inherit;
+  cursor: pointer;
+}
+.re-zoom button[aria-pressed="true"] {
+  background: var(--ink);
+  color: var(--bg);
+}
+
+/* ---------- Editor ---------- */
+
+.re-tabs {
+  display: flex;
+  gap: 4px;
+  margin-bottom: 14px;
+  padding: 3px;
+  border: 1px solid var(--line);
+  border-radius: 10px;
+}
+.re-tabs button {
+  flex: 1;
+  border: 0;
+  background: transparent;
+  color: var(--ink-2);
+  padding: 7px 10px;
+  border-radius: 7px;
+  font: inherit;
+  font-size: 14px;
+  cursor: pointer;
+}
+.re-tabs button[aria-selected="true"] {
+  background: var(--ink);
+  color: var(--bg);
+}
+.re-field {
+  display: grid;
+  gap: 4px;
+  margin-bottom: 12px;
+}
+.re-field > label,
+.re-label {
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--ink-2);
+}
+.re-input,
+.re-text {
+  width: 100%;
+  box-sizing: border-box;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: var(--bg);
+  color: var(--ink);
+  font: inherit;
+  font-size: 14px;
+  line-height: 1.45;
+  padding: 7px 9px;
+}
+.re-text {
+  resize: vertical;
+  display: block;
+}
+.re-input:focus,
+.re-text:focus {
+  outline: 2px solid var(--accent);
+  outline-offset: -1px;
+}
+.re-raw {
+  min-height: 70vh;
+  font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+  font-size: 12.5px;
+}
+.re-sec {
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  padding: 12px;
+  margin-bottom: 14px;
+  background: color-mix(in srgb, var(--ink) 2%, var(--bg));
+}
+.re-sec-head {
+  display: flex;
+  gap: 6px;
+  align-items: center;
+  margin-bottom: 10px;
+}
+.re-sec-head .re-input {
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+.re-icon {
+  flex: none;
+  width: 30px;
+  height: 30px;
+  display: inline-grid;
+  place-items: center;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: var(--bg);
+  color: var(--ink-2);
+  cursor: pointer;
+}
+.re-icon:hover:not(:disabled) {
+  color: var(--ink);
+  border-color: var(--ink-2);
+}
+.re-icon:disabled {
+  opacity: 0.35;
+  cursor: default;
+}
+.re-icon svg {
+  width: 15px;
+  height: 15px;
+}
+.re-entry {
+  border-top: 1px dashed var(--line);
+  padding-top: 10px;
+  margin-top: 10px;
+}
+.re-entry:first-of-type {
+  border-top: 0;
+  padding-top: 0;
+  margin-top: 0;
+}
+.re-bullet {
+  display: flex;
+  gap: 6px;
+  align-items: flex-start;
+  margin-top: 6px;
+}
+.re-bullet .re-text {
+  flex: 1;
+}
+.re-bullet.flag .re-text {
+  border-color: #d97706;
+  background: color-mix(in srgb, #d97706 8%, var(--bg));
+}
+.re-add {
+  margin-top: 8px;
+  border: 1px dashed var(--line);
+  background: transparent;
+  color: var(--ink-2);
+  border-radius: 8px;
+  padding: 6px 10px;
+  font: inherit;
+  font-size: 13px;
+  cursor: pointer;
+}
+.re-add:hover {
+  color: var(--ink);
+  border-color: var(--ink-2);
+}
+.re-addbar {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+/* ---------- Side panel ---------- */
+
+.re-side h2 {
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  color: var(--ink-2);
+  margin: 22px 0 10px;
+}
+.re-side h2:first-child {
+  margin-top: 0;
+}
+.re-tpls {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 8px;
+}
+.re-tpl {
+  text-align: left;
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  background: var(--bg);
+  color: var(--ink);
+  padding: 8px;
+  cursor: pointer;
+  font: inherit;
+}
+.re-tpl[aria-pressed="true"] {
+  border-color: var(--accent);
+  outline: 2px solid var(--accent);
+  outline-offset: -1px;
+}
+.re-tpl b {
+  display: block;
+  font-size: 13px;
+}
+.re-tpl span {
+  display: block;
+  font-size: 11.5px;
+  color: var(--ink-2);
+  line-height: 1.3;
+}
+.re-thumb {
+  height: 64px;
+  border-radius: 4px;
+  background: #fff;
+  border: 1px solid #e5e2da;
+  margin-bottom: 6px;
+  padding: 7px 8px;
+  overflow: hidden;
+}
+.re-thumb i {
+  display: block;
+  height: 3px;
+  border-radius: 2px;
+  background: #cfcbc0;
+  margin-bottom: 4px;
+}
+.re-thumb i.n {
+  height: 6px;
+  width: 55%;
+  background: var(--tc, #222);
+}
+.re-thumb i.h {
+  width: 35%;
+  background: var(--tc, #222);
+  height: 2px;
+}
+.re-thumb.center i.n {
+  margin-left: auto;
+  margin-right: auto;
+}
+.re-seg {
+  display: flex;
+  gap: 4px;
+  margin-bottom: 10px;
+}
+.re-seg button {
+  flex: 1;
+  border: 1px solid var(--line);
+  background: var(--bg);
+  color: var(--ink);
+  border-radius: 8px;
+  padding: 6px 4px;
+  font: inherit;
+  font-size: 13px;
+  cursor: pointer;
+}
+.re-seg button[aria-pressed="true"] {
+  background: var(--ink);
+  color: var(--bg);
+  border-color: var(--ink);
+}
+.re-swatches {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+.re-swatch {
+  width: 26px;
+  height: 26px;
+  border-radius: 50%;
+  border: 2px solid var(--bg);
+  box-shadow: 0 0 0 1px var(--line);
+  cursor: pointer;
+}
+.re-swatch[aria-pressed="true"] {
+  box-shadow: 0 0 0 2px var(--ink);
+}
+.re-check {
+  display: grid;
+  grid-template-columns: 18px 1fr;
+  gap: 8px;
+  padding: 7px 0;
+  border-top: 1px solid var(--line);
+  font-size: 13px;
+  line-height: 1.4;
+}
+.re-check:first-of-type {
+  border-top: 0;
+}
+.re-check b {
+  display: block;
+  font-weight: 600;
+}
+.re-check span.d {
+  color: var(--ink-2);
+}
+.re-dot {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  margin-top: 4px;
+  background: #16a34a;
+}
+.re-dot.warn {
+  background: #d97706;
+}
+.re-dot.fail {
+  background: #dc2626;
+}
+.re-flag {
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  padding: 9px 10px;
+  margin-bottom: 8px;
+  font-size: 13px;
+  line-height: 1.4;
+}
+.re-flag q {
+  display: block;
+  font-style: normal;
+  font-weight: 600;
+}
+.re-flag .why {
+  color: var(--ink-2);
+}
+.re-flag .plain {
+  display: block;
+  margin-top: 6px;
+  padding: 6px 8px;
+  border-radius: 6px;
+  background: color-mix(in srgb, #16a34a 11%, var(--bg));
+}
+.re-note {
+  font-size: 12.5px;
+  line-height: 1.45;
+  color: var(--ink-2);
+}
+.re-chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 5px;
+}
+.re-chip {
+  font-size: 12px;
+  padding: 2px 8px;
+  border-radius: 999px;
+  border: 1px solid var(--line);
+}
+.re-chip.ok {
+  background: color-mix(in srgb, #16a34a 14%, var(--bg));
+}
+.re-chip.rel {
+  background: color-mix(in srgb, #2563eb 14%, var(--bg));
+}
+.re-chip.miss {
+  background: color-mix(in srgb, #d97706 14%, var(--bg));
+}
+.re-score {
+  display: flex;
+  align-items: baseline;
+  gap: 8px;
+  margin-top: 4px;
+}
+.re-score b {
+  font-family: "Instrument Serif", serif;
+  font-weight: 400;
+  font-size: 34px;
+  line-height: 1;
+}
+.re-score span {
+  font-size: 13px;
+  color: var(--ink-2);
+}
+.re-track {
+  height: 6px;
+  border-radius: 3px;
+  background: var(--line);
+  margin: 6px 0 8px;
+  overflow: hidden;
+}
+.re-track i {
+  display: block;
+  height: 100%;
+  background: var(--accent);
+  border-radius: 3px;
+}
+
+/* ---------- The page ---------- */
+
+.re-sheet {
+  position: relative;
+  width: 816px;
+  flex: none;
+}
+.re-paper {
+  --pad: 52.8px; /* 0.55in, the same margin the printed page uses */
+  --fs: 13.5px;
+  --gap: 1;
+  position: relative;
+  box-sizing: border-box;
+  width: 816px;
+  min-height: 1056px;
+  padding: var(--pad);
+  background: #fff;
+  color: #1d1d1b;
+  font-size: var(--fs);
+  line-height: 1.38;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.14), 0 12px 34px rgba(0, 0, 0, 0.16);
+  -webkit-print-color-adjust: exact;
+  print-color-adjust: exact;
+}
+.re-paper.sz-small {
+  --fs: 12.5px;
+}
+.re-paper.sz-large {
+  --fs: 14.5px;
+}
+.re-paper.sp-tight {
+  --gap: 0.72;
+}
+.re-paper.sp-roomy {
+  --gap: 1.3;
+}
+/* Approximate page breaks while editing; the print layout paginates for real. */
+.re-breaks {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+}
+.re-breaks span {
+  position: absolute;
+  left: 0;
+  right: 0;
+  border-top: 1.5px dashed rgba(120, 120, 120, 0.55);
+}
+.re-breaks span::after {
+  content: "page break";
+  position: absolute;
+  right: 8px;
+  top: 3px;
+  font: 11px/1 ui-sans-serif, system-ui, sans-serif;
+  color: #8a8a8a;
+}
+
+.rp-head h1 {
+  margin: 0;
+  font-size: 2.15em;
+  line-height: 1.12;
+  font-weight: 700;
+  letter-spacing: -0.01em;
+}
+.rp-contact {
+  margin: 0.35em 0 calc(0.9em * var(--gap));
+  font-size: 0.92em;
+  color: #444;
+}
+.rp-section {
+  margin-top: calc(1.05em * var(--gap));
+}
+.rp-section h2 {
+  margin: 0 0 calc(0.45em * var(--gap));
+  font-size: 0.95em;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  break-after: avoid;
+}
+.rp-p {
+  margin: 0 0 0.3em;
+}
+.rp-entry {
+  margin-bottom: calc(0.7em * var(--gap));
+  break-inside: avoid;
+}
+.rp-entry:last-child {
+  margin-bottom: 0;
+}
+.rp-role {
+  display: flex;
+  justify-content: space-between;
+  gap: 16px;
+  align-items: baseline;
+  break-after: avoid;
+}
+.rp-role-main {
+  font-weight: 700;
+}
+.rp-role-main span {
+  font-weight: 600;
+}
+.rp-role-meta {
+  flex: none;
+  text-align: right;
+  font-size: 0.92em;
+  color: #444;
+}
+/* The app's reset removes list markers, so the page puts real bullets back. */
+.re-paper ul {
+  list-style: disc outside;
+  margin: 0.25em 0 0;
+  padding-left: 1.3em;
+}
+.re-paper li {
+  display: list-item;
+  list-style: disc outside;
+  margin: 0 0 calc(0.18em * var(--gap));
+  padding-left: 0.1em;
+}
+.re-paper li::marker {
+  color: var(--accent);
+}
+.rp-entry li b {
+  font-weight: 700;
+}
+
+/* Classic: serif, centred header, ruled headings */
+.rt-classic {
+  font-family: Georgia, "Times New Roman", serif;
+}
+.rt-classic .rp-head {
+  text-align: center;
+}
+.rt-classic .rp-head h1 {
+  font-weight: 700;
+}
+.rt-classic .rp-section h2 {
+  border-bottom: 1px solid var(--accent);
+  padding-bottom: 0.2em;
+  color: var(--accent);
+}
+
+/* Modern: sans, accent headings */
+.rt-modern {
+  font-family: "Segoe UI", Arial, Helvetica, sans-serif;
+}
+.rt-modern .rp-head h1 {
+  color: var(--accent);
+}
+.rt-modern .rp-section h2 {
+  color: var(--accent);
+  border-bottom: 2px solid color-mix(in srgb, var(--accent) 30%, #fff);
+  padding-bottom: 0.25em;
+}
+
+/* Compact: dense */
+.rt-compact {
+  font-family: Arial, Helvetica, sans-serif;
+  line-height: 1.28;
+}
+.rt-compact .rp-head h1 {
+  font-size: 1.7em;
+}
+.rt-compact .rp-section {
+  margin-top: calc(0.8em * var(--gap));
+}
+.rt-compact .rp-section h2 {
+  font-size: 0.88em;
+  border-bottom: 1px solid #999;
+  padding-bottom: 0.15em;
+}
+.rt-compact .rp-entry li {
+  margin-bottom: 0;
+}
+
+/* Executive: serif, spaced small caps */
+.rt-executive {
+  font-family: Georgia, "Times New Roman", serif;
+}
+.rt-executive .rp-head {
+  border-bottom: 3px double var(--accent);
+  padding-bottom: 0.55em;
+}
+.rt-executive .rp-head h1 {
+  font-weight: 400;
+  font-size: 2.4em;
+  letter-spacing: 0.02em;
+  color: var(--accent);
+}
+.rt-executive .rp-contact {
+  margin-bottom: 0;
+}
+.rt-executive .rp-section h2 {
+  font-variant: small-caps;
+  text-transform: none;
+  letter-spacing: 0.14em;
+  font-size: 1.08em;
+  color: var(--accent);
+}
+
+/* Minimal: light and airy, no rules */
+.rt-minimal {
+  font-family: "Segoe UI", Arial, Helvetica, sans-serif;
+  line-height: 1.5;
+}
+.rt-minimal .rp-head h1 {
+  font-weight: 300;
+  font-size: 2.3em;
+}
+.rt-minimal .rp-section h2 {
+  font-weight: 600;
+  font-size: 0.8em;
+  letter-spacing: 0.16em;
+  color: var(--accent);
+}
+.rt-minimal .rp-role-main {
+  font-weight: 600;
+}
+
+/* Bold: strong name, accent bars */
+.rt-bold {
+  font-family: "Segoe UI", Arial, Helvetica, sans-serif;
+}
+.rt-bold .rp-head h1 {
+  font-size: 2.5em;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.01em;
+}
+.rt-bold .rp-section h2 {
+  border-left: 5px solid var(--accent);
+  padding: 0.12em 0 0.12em 0.6em;
+  background: color-mix(in srgb, var(--accent) 9%, #fff);
+}
+
+@media (max-width: 1100px) {
+  .re-page {
+    height: auto;
+  }
+  .re-shell {
+    grid-template-columns: minmax(0, 1fr);
+  }
+  .re-col {
+    overflow: visible;
+  }
+  /* The page preview scales to the screen; at 100% it scrolls sideways inside its own box. */
+  .re-stage {
+    overflow-x: auto;
+    overflow-y: visible;
+  }
+  .re-edit,
+  .re-side {
+    border: 0;
+  }
+  .re-stage {
+    order: -1;
+  }
+}
+
+@media print {
+  @page {
+    size: Letter;
+    margin: 0.55in;
+  }
+  html,
+  body {
+    background: #fff !important;
+  }
+  .re-page,
+  .re-shell,
+  .re-stage,
+  .re-stage > div {
+    height: auto !important;
+    width: auto !important;
+    overflow: visible !important;
+    display: block !important;
+    padding: 0 !important;
+  }
+  body * {
+    visibility: hidden;
+  }
+  .re-sheet,
+  .re-sheet * {
+    visibility: visible;
+  }
+  .re-sheet {
+    position: absolute;
+    left: 0;
+    top: 0;
+    width: 100% !important;
+    zoom: 1 !important;
+    transform: none !important;
+  }
+  .re-paper {
+    width: 100% !important;
+    min-height: 0 !important;
+    padding: 0 !important;
+    box-shadow: none !important;
+  }
+  .re-breaks {
+    display: none;
+  }
+}
+
+.re-doc {
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  padding: 10px 12px;
+  margin: 12px 0 4px;
+  background: color-mix(in srgb, var(--accent) 6%, var(--bg));
+}
+.re-doc summary {
+  cursor: pointer;
+}

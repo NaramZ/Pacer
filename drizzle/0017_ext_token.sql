@@ -1,0 +1,1 @@
+ALTER TABLE `automation_settings` ADD `ext_token_hash` text DEFAULT '' NOT NULL;

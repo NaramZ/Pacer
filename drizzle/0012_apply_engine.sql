@@ -1,0 +1,1 @@
+ALTER TABLE `automation_settings` ADD `apply_engine` text DEFAULT 'subscription' NOT NULL;

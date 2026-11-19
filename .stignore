@@ -1,0 +1,11 @@
+// Syncthing: files that stay on each computer.
+// Built for one operating system; run `npx pnpm@11.25.0 install` on each computer instead.
+node_modules
+// The helper browser's sign-ins only work on the computer they were made on.
+.helper/browser-profile
+// Build leftovers, recreated on start.
+.vinext
+dist
+// The database's temporary files while Pacer is running.
+*.sqlite-wal
+*.sqlite-shm

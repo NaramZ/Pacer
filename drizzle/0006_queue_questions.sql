@@ -1,0 +1,1 @@
+ALTER TABLE `automation_queue` ADD `questions_json` text DEFAULT '[]' NOT NULL;

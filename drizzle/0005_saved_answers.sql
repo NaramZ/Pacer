@@ -1,0 +1,1 @@
+ALTER TABLE `profiles` ADD `answers_json` text DEFAULT '{}' NOT NULL;

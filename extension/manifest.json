@@ -1,0 +1,24 @@
+{
+  "manifest_version": 3,
+  "name": "Pacer",
+  "version": "1.0.0",
+  "description": "Fills in job applications with your tailored resume, cover letter and saved answers from the Pacer app on this computer.",
+  "action": {
+    "default_popup": "popup.html",
+    "default_title": "Pacer: fill in this application"
+  },
+  "permissions": [
+    "activeTab",
+    "scripting",
+    "storage"
+  ],
+  "host_permissions": [
+    "<all_urls>"
+  ],
+  "icons": {
+    "16": "icons/16.png",
+    "48": "icons/48.png",
+    "128": "icons/128.png"
+  },
+  "key": "MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAu7EV7nger4HvrjwR6exKF9lvVeyBaKvHpp5PY6eoVVRYHcWToJEaJt+B2Q+0tV2CfeUE++BRMcih05KEwBBl2IsBfwAGs8EjTpp+BnhDX1javTVWV5v4kmVf6yW+jC9uq00P43CqzOfKoVQLhenIgJQ/k/oHBQuPsf+zNZIy53mJssuw2CvFrQCoMbzq0rcC+L8HWacpSFJDdGnHgAoJfsz6eDao5TJ2keLhI4amyKOQIlvtLxo3nQ9c39QczOxKLmKPMtkPaliqD4D0d/gqva3z/u5Zlu7fXLjC/t65R4rkzfeKSgh2H9YL2nD3NOLy83GED6WjaVvk+ZgNFT2MgQIDAQAB"
+}

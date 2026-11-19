@@ -1,0 +1,6 @@
+{
+  // The helper runs directly in Node, which only strips types, so TypeScript-only syntax is disallowed here.
+  "extends": "../tsconfig.json",
+  "compilerOptions": { "erasableSyntaxOnly": true },
+  "include": ["*.ts"]
+}

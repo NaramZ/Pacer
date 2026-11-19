@@ -1,0 +1,1 @@
+ALTER TABLE `ai_usage` ADD `web_searches` integer DEFAULT 0 NOT NULL;
